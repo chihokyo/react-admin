@@ -1,11 +1,18 @@
 import React, { Component } from 'react'
-import { Button, message } from 'antd'
-export default class App extends Component {
-    handleClick = () => {
-        message.success('success!!')
-    }
+import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import Login from './pages/login/login'
+import Admin from './pages/admin/admin'
 
-    render() {
-        return <Button type="primary" onClick={this.handleClick}>primary</Button>
-    }
+export default class App extends Component {
+
+  render() {
+    return (
+      <BrowserRouter>
+        <Switch> {/**只匹配对应的哪一个 */}
+          <Route path='/login' component={Login} />
+          <Route path='/' component={Admin} />
+        </Switch>
+      </BrowserRouter>
+    )
+  }
 }
