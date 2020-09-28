@@ -5,18 +5,18 @@ import {
   Input,
   Button
 } from 'antd'
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined } from '@ant-design/icons'
+
 /**
  * 登录路由文件
  */
 
-// 必须写在import之后
-const Item = Form.Item
-
 class Login extends Component {
 
-  handleSubmit = (e) => {
-    alert('hh')
+  formRef = React.createRef()
+
+  onFinish = (values) => {
+    console.log(values)
   }
 
   render() {
@@ -29,17 +29,44 @@ class Login extends Component {
           <h2>用户登录</h2>
           <div>
             <Form
-              onSubmit={this.handleSubmit}
-              name="normal_login"
+              name="control-ref"
               className="login-form"
+              ref={this.formRef}
+              onFinish={this.onFinish}
             >
-              <Item>
-                <Input
-                  prefix={<UserOutlined className="site-form-item-icon" />}
-                  placeholder="请输入用户名"
-                />
-              </Item>
-              <Form.Item>
+              <Form.Item
+                name="username"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input your Username!',
+                  },
+                ]}
+              >
+                <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="请输入用户名" />
+              </Form.Item>
+              <Form.Item
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    whitespace: true,
+                    message: '用户名是必填项',
+                  },
+                  {
+                    min: 4,
+                    message: '用户名字数不得少于4位',
+                  },
+                  {
+                    max: 12,
+                    message: '用户名字数不能多于12位',
+                  },
+                  {
+                    pattern: /^[a-zA-Z0-9_]+$/,
+                    message: '用户名必须是英文数字或者下划线组成'
+                  }
+                ]}
+              >
                 <Input
                   prefix={<LockOutlined className="site-form-item-icon" />}
                   type="password"
