@@ -19,6 +19,20 @@ class Login extends Component {
     console.log(values)
   }
 
+  // 自定义验证：password
+  validatePwd = (rule, value, callback) => {
+    console.log(rule)
+    if (!value) {
+      return Promise.reject('密码不能为空')
+    } else if (value.length < 4 || value.length > 12) {
+      return Promise.reject('密码必须大于4位小于12位')
+    } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+      return Promise.reject('密码必须是英文数字或者下划线组成')
+    } else {
+      return Promise.resolve()
+    }
+  }
+
   render() {
     return (
       <div className="login">
@@ -39,17 +53,6 @@ class Login extends Component {
                 rules={[
                   {
                     required: true,
-                    message: 'Please input your Username!',
-                  },
-                ]}
-              >
-                <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="请输入用户名" />
-              </Form.Item>
-              <Form.Item
-                name="password"
-                rules={[
-                  {
-                    required: true,
                     whitespace: true,
                     message: '用户名是必填项',
                   },
@@ -64,6 +67,16 @@ class Login extends Component {
                   {
                     pattern: /^[a-zA-Z0-9_]+$/,
                     message: '用户名必须是英文数字或者下划线组成'
+                  }
+                ]}
+              >
+                <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="请输入用户名" />
+              </Form.Item>
+              <Form.Item
+                name="password"
+                rules={[
+                  {
+                    validator: this.validatePwd
                   }
                 ]}
               >
