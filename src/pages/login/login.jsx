@@ -6,22 +6,33 @@ import {
   Button
 } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
+import { reqLogin } from '../../api'
+import { message } from 'antd'
 
 /**
  * 登录路由文件
  */
 
 class Login extends Component {
-
-  formRef = React.createRef()
-
-  onFinish = (values) => {
-    console.log(values)
+  // 这里只去思考请求成功或者失败的情况，至于登录成功与否这里是无法进行判断
+  onFinish = async values => {
+    // 请求登录
+    const { username, password } = values
+    const response = await reqLogin(username, password)
+    console.log(response.status)
+    if (response.status === 0) {
+      // 成功
+      message.success('登录成功')
+      // 跳转到管理界面
+      this.props.history.replace('/')
+    } else {
+      // 失败
+      message.error(response.msg)
+    }
   }
 
   // 自定义验证：password
   validatePwd = (rule, value, callback) => {
-    console.log(rule)
     if (!value) {
       return Promise.reject('密码不能为空')
     } else if (value.length < 4 || value.length > 12) {
@@ -45,7 +56,6 @@ class Login extends Component {
             <Form
               name="control-ref"
               className="login-form"
-              ref={this.formRef}
               onFinish={this.onFinish}
             >
               <Form.Item
