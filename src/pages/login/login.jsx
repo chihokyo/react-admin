@@ -7,7 +7,10 @@ import {
 } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { reqLogin } from '../../api'
+import memoryUtils from '../../utils/memoryUtils'
+import storageUtils from '../../utils/storageUtils'
 import { message } from 'antd'
+import { Redirect } from 'react-router-dom'
 
 /**
  * 登录路由文件
@@ -18,16 +21,18 @@ class Login extends Component {
   onFinish = async values => {
     // 请求登录
     const { username, password } = values
-    const response = await reqLogin(username, password)
-    console.log(response.status)
-    if (response.status === 0) {
+    const result = await reqLogin(username, password)
+    if (result.status === 0) {
       // 成功
       message.success('登录成功')
+      const user = result.data
+      memoryUtils.user = user // 保存在内存里
+      storageUtils.savaUser(user) // 保存在localstorage里
       // 跳转到管理界面
       this.props.history.replace('/')
     } else {
       // 失败
-      message.error(response.msg)
+      message.error(result.msg)
     }
   }
 
@@ -45,6 +50,13 @@ class Login extends Component {
   }
 
   render() {
+    // 首先判断登录状态
+    // 如果用户已经登录则自动跳转到管理页面
+    const user = memoryUtils.user
+    if (user && user._id) {
+      return <Redirect to='/' />
+    }
+
     return (
       <div className="login">
         <header className="login-header">
