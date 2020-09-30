@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import { Menu } from 'antd'
 import logo from '../../assets/images/logo192.png'
 import menuList from '../../config/menuConfig'
@@ -9,7 +9,7 @@ const { SubMenu } = Menu
 /**
  * 左侧导航组件
  */
-export default class LeftNav extends Component {
+class LeftNav extends Component {
 
   /**
    * 根据menuList数组生成带有jsx标签的数组
@@ -75,6 +75,8 @@ export default class LeftNav extends Component {
   }
 
   render() {
+    // 取得当前路径
+    const currentPath = this.props.location.pathname
     return (
       <div to='/' className='left-nav'>
         <Link className='left-nav-header' to='/'>
@@ -84,6 +86,7 @@ export default class LeftNav extends Component {
         <Menu
           mode="inline"
           theme="dark"
+          selectedKeys={[currentPath]}
         >
           {
             // 通过函数，输入一个数组，返回一个jsx标签
@@ -94,3 +97,10 @@ export default class LeftNav extends Component {
     )
   }
 }
+
+/**
+ * with 高接路由组件
+ * 包装非路由组件，返回一个新的组件
+ * 新的组件向非路由组件传递了三个属性 history/location/match
+ */
+export default withRouter(LeftNav)
