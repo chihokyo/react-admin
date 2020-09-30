@@ -47,6 +47,8 @@ class LeftNav extends Component {
    * @param {Array} menuList 
    */
   getMenuNodeByReduce = (menuList) => {
+    // 得到当前路径
+    const currentPath = this.props.location.pathname
     // pre 上一次的结果，初始值就是reduce第二个参数，也就是[] 不断向里面添加
     // item 
     return menuList.reduce((pre, item) => {
@@ -60,6 +62,11 @@ class LeftNav extends Component {
           </Menu.Item>
         ))
       } else {
+        // 查找一个与当前请求路径匹配的子item
+        const chilItem = item.children.find(chilItem => chilItem.key === currentPath)
+        if (chilItem) {
+          this.openKey = item.key
+        }
         pre.push((
           <SubMenu
             key={item.key}
@@ -73,10 +80,22 @@ class LeftNav extends Component {
       return pre
     }, [])
   }
+  /**
+   * 
+   * 在render之前进行执行
+   */
+  constructor(props) {
+    super(props)
+    // 先去请求数据
+    this.menuNode = this.getMenuNodeByReduce(menuList)
+
+  }
 
   render() {
     // 取得当前路径
     const currentPath = this.props.location.pathname
+    const openKey = this.openKey
+    console.log(openKey)
     return (
       <div to='/' className='left-nav'>
         <Link className='left-nav-header' to='/'>
@@ -87,10 +106,11 @@ class LeftNav extends Component {
           mode="inline"
           theme="dark"
           selectedKeys={[currentPath]}
+          defaultOpenKeys={[openKey]}
         >
           {
             // 通过函数，输入一个数组，返回一个jsx标签
-            this.getMenuNodeByReduce(menuList)
+            this.menuNode
           }
         </Menu>
       </div>
