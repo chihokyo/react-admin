@@ -37,16 +37,16 @@ class Admin extends Component {
         </Sider>
         <Layout>
           <Header>Header</Header>
-          <Content style={{ backgroundColor: '#fff' }}>
+          <Content style={{ margin: 20, backgroundColor: '#fff' }}>
             <Switch>
               <Route path='/home' component={Home} />
               <Route path='/category' component={Category} />
               <Route path='/product' component={Product} />
               <Route path='/role' component={Role} />
               <Route path='/user' component={User} />
-              <Route path='/line' component={Line} />
-              <Route path='/pie' component={Pie} />
-              <Route path='/bar' component={Bar} />
+              <Route path='/charts/line' component={Line} />
+              <Route path='/charts/pie' component={Pie} />
+              <Route path='/charts/bar' component={Bar} />
               <Redirect to='/home' />
             </Switch>
           </Content>
