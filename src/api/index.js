@@ -42,5 +42,3 @@ export const reqWeather = (city) => {
     })
 
 }
-
-reqWeather('北京')
