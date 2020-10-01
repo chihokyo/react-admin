@@ -1,9 +1,12 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
+import LinkButton from '../link-button'
 import { reqWeather } from '../../api/index'
 import menuList from '../../config/menuConfig'
 import { formateDate } from '../../utils/dateUtils'
 import memoryUtils from '../../utils/memoryUtils'
+import storageUtils from '../../utils/storageUtils'
+import { Modal } from 'antd'
 
 import './index.less'
 /**
@@ -16,6 +19,27 @@ class Header extends Component {
         currentTime: formateDate(Date.now()), // 当前时间字符串
         dayPictureUrl: '', // 天气图片url
         weather: '', // 天气文本
+    }
+
+    // 退出登录
+    logout = () => {
+        // 显示退出确认框
+        const { confirm } = Modal
+        confirm({
+            content: '是否确定退出登录',
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk: () => {
+                // 如果确定删除保存的user数据
+                storageUtils.removeUser()
+                memoryUtils.user = {}
+                // 跳转到登录页面
+                this.props.history.replace('/login')
+            },
+            onCancel() {
+            },
+        })
     }
 
     // 获取body相应的title
@@ -41,7 +65,7 @@ class Header extends Component {
 
     // 每隔1s获取时间
     getTime = () => {
-        setInterval(() => {
+        this.intervalId = setInterval(() => {
             const currentTime = formateDate(Date.now())
             this.setState({ currentTime })
         }, 1000)
@@ -68,6 +92,14 @@ class Header extends Component {
         this.getWeather()
     }
 
+    /**
+     * 当前组件写在之前调用
+     * 用来消除回调函数和定时器等等
+     */
+    componentWillUnmount() {
+        clearInterval(this.intervalId)
+    }
+
     render() {
         const { currentTime, dayPictureUrl, weather } = this.state
         const username = memoryUtils.user.username
@@ -76,7 +108,7 @@ class Header extends Component {
             <div className="header">
                 <div className="header-top">
                     <span>欢迎，{username}</span>
-                    <a href="javascript;">退出</a>
+                    <LinkButton onClick={this.logout}>退出</LinkButton>
                 </div>
                 <div className="header-bottom">
                     <div className="header-bottom-left">{title}</div>
