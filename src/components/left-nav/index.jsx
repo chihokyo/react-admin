@@ -18,7 +18,6 @@ class LeftNav extends Component {
    */
 
   getMenuNodeByMap = (menuList) => {
-    console.log(menuList)
     return menuList.map(item => {
       if (!item.children) {
         return (
@@ -95,7 +94,6 @@ class LeftNav extends Component {
     // 取得当前路径
     const currentPath = this.props.location.pathname
     const openKey = this.openKey
-    console.log(openKey)
     return (
       <div to='/' className='left-nav'>
         <Link className='left-nav-header' to='/'>
@@ -119,7 +117,7 @@ class LeftNav extends Component {
 }
 
 /**
- * with 高接路由组件
+ * withRouter 高阶路由组件
  * 包装非路由组件，返回一个新的组件
  * 新的组件向非路由组件传递了三个属性 history/location/match
  */
