@@ -7,6 +7,9 @@
 import jsonp from 'jsonp'
 import ajax from "./ajax";
 import { message } from 'antd'
+
+// const BASE = 'http://localhost:5000'
+const BASE = ''
 // 登录接口
 export const reqLogin = (username, password) => ajax(
     '/login',
@@ -17,13 +20,41 @@ export const reqLogin = (username, password) => ajax(
 // 注册用户接口
 // userObj 这里直接就是一个对象，包含了用户名密码电话号码等等信息在内的对象
 export const reqAddUser = (userObj) => ajax(
-    '/manage/user/add',
+    BASE + '/manage/user/add',
     userObj,
     'POST'
 )
 
 /**
+ * 关于分类列表的接口
+ * 
+ */
+
+// 获取分类
+export const reqCategorys = (parentId) => ajax(
+    BASE + '/manage/category/list',
+    { parentId },
+)
+
+// 添加分类
+// 可以选择2个参数
+export const reqAddCategory = (parentId, categoryName) => ajax(
+    BASE + '/manage/category/add',
+    { parentId, categoryName },
+    'POST'
+)
+
+// 更新分类
+// 也可以选择1个对象包含2个参数
+export const reqUpdateCategory = ({ categoryId, categoryName }) => ajax(
+    BASE + '/manage/category/update',
+    { categoryId, categoryName },
+    'POST'
+)
+
+/**
  * jsonp请求的接口函数
+ * @param {string} city 
  */
 
 export const reqWeather = (city) => {
