@@ -2,44 +2,25 @@ import React, { Component } from 'react'
 import {
   Card,
   Button,
-  Table
+  Table, message
 } from 'antd'
 import LinkButton from '../../components/link-button'
-
+import { reqCategorys, reqAddCategory, reqUpdateCategory } from '../../api/'
 /**
  * 商品分类路由
  */
 export default class Category extends Component {
-  render() {
-    // card标题
-    const title = '一级分类'
-    const extra = (
-      <Button type="primary">
-        添加
-      </Button>
-    )
-    const dataSource = [
-      {
-        "parentId": "0",
-        "_id": "5c2ed631f352726338607046",
-        "name": "分类001",
-        "__v": 0
-      },
-      {
-        "parentId": "0",
-        "_id": "5c2ed647f352726338607047",
-        "name": "分类2",
-        "__v": 0
-      },
-      {
-        "parentId": "0",
-        "_id": "5c2ed64cf352726338607048",
-        "name": "1分类3",
-        "__v": 0
-      }
-    ]
 
-    const columns = [
+  state = {
+    loading: false, // 是否正在获取数据
+    categorys: [], // 1级分类列表
+  }
+
+  /**
+   * 初始化table所有列数组
+   */
+  initColumns = () => {
+    this.columns = [
       {
         title: '分类名称',
         dataIndex: 'name', // 数据对应的属性名 ↑数据的name
@@ -57,14 +38,57 @@ export default class Category extends Component {
         )
       }
     ]
+  }
+
+  /**
+   * 获取1级分类列表
+   */
+  getCategorys = async () => {
+    // 请求前loading
+    this.setState({ loading: true })
+    const result = await reqCategorys('0')
+    this.setState({ loading: false })
+    if (result.status === '0') {
+      const categorys = result.data
+      this.setState({
+        categorys
+      })
+    } else {
+      message.error('获取分类列表失败')
+    }
+  }
+
+  // 初始化列表数据
+  constructor(props) {
+    super(props)
+    this.initColumns()
+  }
+
+  // 异步ajax请求获取列表信息
+  componentDidMount() {
+    this.getCategorys()
+  }
+
+  render() {
+    const { categorys, loading } = this.state
+    // card标题
+    const title = '一级分类'
+    const extra = (
+      <Button type="primary">
+        添加
+      </Button>
+    )
+
     return (
       <div>
         <Card title={title} extra={extra}>
           <Table
             bordered={true}
             rowKey='_id'
-            dataSource={dataSource}
-            columns={columns}
+            loading={loading}
+            dataSource={categorys}
+            columns={this.columns}
+            pagination={{ defaultPageSize: 10, showQuickJumper: true }}
           />
         </Card>
       </div>
