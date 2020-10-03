@@ -2,11 +2,16 @@ import React, { Component } from 'react'
 import {
   Card,
   Button,
-  Table, message
+  Table,
+  message,
+  Modal
 } from 'antd'
 import { ArrowRightOutlined } from '@ant-design/icons'
 import LinkButton from '../../components/link-button'
 import { reqCategorys } from '../../api/'
+import AddForm from './add-form'
+import UpdateForm from './update-form'
+
 /**
  * 商品分类路由
  */
@@ -14,10 +19,11 @@ export default class Category extends Component {
 
   state = {
     loading: false, // 是否正在获取数据
-    category: [], // 1级分类列表
+    categorys: [], // 1级分类列表
     parentId: '0', // 当前显示的父类列表ID
     parentName: '', // 当前显示的父类列表title
-    subCategorys: []
+    subCategorys: [], // 2级分类列表
+    showModalStatus: 0 // 新增or更新列表的对话框状态 【0：都不显示 1：显示新增 2：显示更新】
   }
 
   /**
@@ -32,16 +38,15 @@ export default class Category extends Component {
       {
         title: '操作',
         width: 300,
-        dataIndex: 'age',
         // 指定需要返回的页面标签
-        render: (category) => (
+        render: (categorys) => (
           <span>
-            <LinkButton>修改分类</LinkButton>
+            <LinkButton onClick={() => this.showUpdateModal(categorys)}>修改分类</LinkButton>
             {/* 下面是错误的，因为初始化的时候不能调用onclick，这样就会直接执行了
             而需要在触发事件进行调用的话。外面就需要在进行包裹一层函数 */}
-            {/* <LinkButton onClick={ this.shouldComponentUpdate(category)}>查看子分类</LinkButton> */}
+            {/* <LinkButton onClick={ this.showSubCategorys(category)}>查看子分类</LinkButton> */}
             {/* 如何向事件回调函数进行传递参数，先定义一个回调函数，里面在定义一个函数传入数据 */}
-            {this.state.parentId === '0' ? <LinkButton onClick={() => { this.shouldComponentUpdate(category) }}>查看子分类</LinkButton> : null}
+            {this.state.parentId === '0' ? <LinkButton onClick={() => this.showSubCategorys(categorys)}>查看子分类</LinkButton> : null}
           </span>
         )
       }
@@ -58,23 +63,21 @@ export default class Category extends Component {
     const { parentId } = this.state
     // 获取1级or2级列表数据
     const result = await reqCategorys(parentId)
-
     this.setState({ loading: false })
-
     // 判断请求是否成功
     // 成功
-    if (result.status === '0') {
-      const category = result.data
+    if (result.status === 0) {
+      const categorys = result.data
       // 判断结果是1级列表or2级列表
       // 1级
       if (parentId === '0') {
         this.setState({
-          category
+          categorys
         })
         // 2级
       } else {
         this.setState({
-          subCategorys: category
+          subCategorys: categorys
         })
       }
       // 失败
@@ -114,6 +117,52 @@ export default class Category extends Component {
     })
   }
 
+  /**
+   * 显示新增分类对话框
+   */
+  showAddModal = () => {
+    this.setState({
+      showModalStatus: 1
+    })
+  }
+
+  /**
+   * 显示修改分类对话框
+   */
+  showUpdateModal = (categorys) => {
+    console.log('showUpdateModal', categorys)
+    // 保存分类对象
+    this.category = categorys
+    this.setState({
+      showModalStatus: 2
+    })
+  }
+
+  /**
+   * 新增分类
+   */
+  addCategory = () => {
+    console.log('addCategory()');
+  }
+
+  /**
+   * 更新分类
+   */
+  updateCategory = () => {
+    console.log('updateCategory()');
+
+  }
+
+  /**
+   * 响应点击取消隐藏对话框
+   * 本质→ 修改对话框状态（关闭）
+   */
+  handleCancel = () => {
+    this.setState({
+      showModalStatus: 0
+    })
+  }
+
   // 初始化列表数据
   constructor(props) {
     super(props)
@@ -126,7 +175,15 @@ export default class Category extends Component {
   }
 
   render() {
-    const { category, loading, subCategorys, parentId, parentName } = this.state
+    const {
+      categorys,
+      loading,
+      subCategorys,
+      parentId,
+      parentName,
+      showModalStatus
+    } = this.state
+    // 读取指定的分类
     // card标题
     const title = parentId === '0' ? '1级分类列表' : (
       <span>
@@ -137,7 +194,7 @@ export default class Category extends Component {
     )
 
     const extra = (
-      <Button type="primary">
+      <Button type="primary" onClick={this.showAddModal}>
         添加
       </Button>
     )
@@ -149,12 +206,31 @@ export default class Category extends Component {
             bordered={true}
             rowKey='_id'
             loading={loading}
-            dataSource={parentId === '0' ? category : subCategorys}
+            dataSource={parentId === '0' ? categorys : subCategorys}
             columns={this.columns}
             pagination={{ defaultPageSize: 10, showQuickJumper: true }}
           />
         </Card>
+
+        <Modal
+          title="新增分类"
+          visible={showModalStatus === 1}
+          onOk={this.addCategory}
+          onCancel={this.handleCancel}
+        >
+          <AddForm ></AddForm>
+        </Modal>
+
+        <Modal
+          title="修改分类"
+          visible={showModalStatus === 2}
+          onOk={this.updateCategory}
+          onCancel={this.handleCancel}
+        >
+          <UpdateForm></UpdateForm>
+        </Modal>
       </div>
     )
   }
+
 }
