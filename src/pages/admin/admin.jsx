@@ -50,7 +50,7 @@ class Admin extends Component {
               <Redirect to='/home' />
             </Switch>
           </Content>
-          <Footer style={{ textAlign: 'center', color: 'grey' }}>React练习用，谷歌浏览器食用效果更佳</Footer>
+          <Footer style={{ textAlign: 'center', color: 'grey' }}>❤ &nbsp;React练习用，谷歌浏览器食用效果更佳</Footer>
         </Layout>
       </Layout>
     )

@@ -10,11 +10,13 @@ const Item = Form.Item
  */
 
 export default class UpdateForm extends Component {
+
     render() {
+        const { categoryName } = this.props
         return (
             <Form
                 initialValues={{
-                    categorys: '更新前的值',
+                    categoryTitle: categoryName
                 }}
             >
                 <Item name="categoryTitle">
