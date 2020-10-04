@@ -130,7 +130,6 @@ export default class Category extends Component {
    * 显示修改分类对话框
    */
   showUpdateModal = (categorys) => {
-    console.log('showUpdateModal()', categorys)
     // 保存分类对象
     this.category = categorys
     this.setState({
@@ -184,8 +183,8 @@ export default class Category extends Component {
       showModalStatus
     } = this.state
     // 读取指定的分类(默认一个空对象)
-    console.log(this.category)
     const category = this.category || {}
+
     // card标题
     const title = parentId === '0' ? '1级分类列表' : (
       <span>
@@ -228,6 +227,7 @@ export default class Category extends Component {
           visible={showModalStatus === 2}
           onOk={this.updateCategory}
           onCancel={this.handleCancel}
+          destroyOnClose
         >
           <UpdateForm categoryName={category.name}></UpdateForm>
         </Modal>
