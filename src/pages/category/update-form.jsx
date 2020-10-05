@@ -11,6 +11,10 @@ const Item = Form.Item
 
 export default class UpdateForm extends Component {
 
+    onChangeCategoryTitle = (e) => {
+        this.props.handleInputValue(e.target.value)
+    }
+
     render() {
         const { categoryName } = this.props
         return (
@@ -19,7 +23,7 @@ export default class UpdateForm extends Component {
                     categoryTitle: categoryName
                 }}
             >
-                <Item name="categoryTitle">
+                <Item name="categoryTitle" onChange={this.onChangeCategoryTitle}>
                     <Input placeholder="请输入分类名称" />
                 </Item>
             </Form>
