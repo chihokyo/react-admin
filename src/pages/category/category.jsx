@@ -8,7 +8,7 @@ import {
 } from 'antd'
 import { ArrowRightOutlined } from '@ant-design/icons'
 import LinkButton from '../../components/link-button'
-import { reqCategorys } from '../../api/'
+import { reqCategorys, reqUpdateCategory } from '../../api/'
 import AddForm from './add-form'
 import UpdateForm from './update-form'
 
@@ -23,7 +23,8 @@ export default class Category extends Component {
     parentId: '0', // 当前显示的父类列表ID
     parentName: '', // 当前显示的父类列表title
     subCategorys: [], // 2级分类列表
-    showModalStatus: 0 // 新增or更新列表的对话框状态 【0：都不显示 1：显示新增 2：显示更新】
+    showModalStatus: 0, // 新增or更新列表的对话框状态 【0：都不显示 1：显示新增 2：显示更新】
+    newTitle: ''
   }
 
   /**
@@ -106,6 +107,16 @@ export default class Category extends Component {
   }
 
   /**
+   * 获取子组件列表中的category title值
+   * @param {string} val 
+   */
+  handleInputValue = (val) => {
+    this.setState({
+      newTitle: val
+    })
+  }
+
+  /**
    * 显示1级分类列表
    */
   showMainCategorys = () => {
@@ -130,7 +141,6 @@ export default class Category extends Component {
    * 显示修改分类对话框
    */
   showUpdateModal = (categorys) => {
-    console.log('showUpdateModal()', categorys)
     // 保存分类对象
     this.category = categorys
     this.setState({
@@ -148,9 +158,21 @@ export default class Category extends Component {
   /**
    * 更新分类
    */
-  updateCategory = () => {
+  updateCategory = async () => {
+    console.log(this.category);
     console.log('updateCategory()')
+    // 步骤1：隐藏确定框
+    this.setState({
+      showModalStatus: 0
+    })
 
+    // 步骤2：发送ajax请求更新分类
+    const categoryId = this.category._id // id可以直接取得
+    const categoryName = this.state.newTitle
+    const result = await reqUpdateCategory({ categoryId, categoryName })
+    if (result.status === 0) {
+      this.getCategorys()
+    }
   }
 
   /**
@@ -184,8 +206,8 @@ export default class Category extends Component {
       showModalStatus
     } = this.state
     // 读取指定的分类(默认一个空对象)
-    console.log(this.category)
     const category = this.category || {}
+
     // card标题
     const title = parentId === '0' ? '1级分类列表' : (
       <span>
@@ -228,8 +250,13 @@ export default class Category extends Component {
           visible={showModalStatus === 2}
           onOk={this.updateCategory}
           onCancel={this.handleCancel}
+          destroyOnClose
         >
-          <UpdateForm categoryName={category.name}></UpdateForm>
+          <UpdateForm
+            categoryName={category.name}
+            handleInputValue={this.handleInputValue}
+          >
+          </UpdateForm>
         </Modal>
       </div>
     )
