@@ -26,8 +26,10 @@ export const reqAddUser = (userObj) => ajax(
 )
 
 /**
- * 关于分类列表的接口
- * 
+ * 关于分类接口
+ * @param {function} reqCategorys 获取分类
+ * @param {function} reqAddCategory 添加分类
+ * @param {function} reqUpdateCategory 更新分类
  */
 
 // 获取分类
@@ -52,10 +54,51 @@ export const reqUpdateCategory = ({ categoryId, categoryName }) => ajax(
     'POST'
 )
 
+// 根据ID获取分类
+export const reqCategoryById = (categoryId) => ajax(
+    BASE + '/manage/category/info',
+    { categoryId },
+)
+
+/**
+ * 关于商品接口
+ * @param {function} reqProducts  获取商品分页列表
+ * @param {function} reqSearchProducts  搜索商品分页列表
+ */
+
 // 获取商品分页列表
 export const reqProducts = (pageNum, pageSize) => ajax(
     BASE + '/manage/product/list',
     { pageNum, pageSize }
+)
+
+// 搜索商品分页列表
+// 商品名称or商品描述
+// SearchType 搜索类型 productName/productDesc
+// 本来是区别成2个方法的，但是这个下面这个方法就是把SearchType变成了属性。并且值只能是 productName/productDesc
+export const reqSearchProducts = ({ pageNum, pageSize, searchName, searchType }) => ajax(
+    BASE + '/manage/product/search',
+    {
+        pageNum,
+        pageSize,
+        [searchType]: searchName
+    }
+)
+// // 根据商品描述
+// export const reqSearchProducts2 = (pageNum, pageSize, SearchName, SearchType) => ajax(
+//     BASE + '/manage/product/search',
+//     {
+//         pageNum,
+//         pageSize,
+//         productType: SearchName
+//     }
+// )
+
+// 更新商品状态 1在售 2下架
+export const reqUpdateProductStatus = (productId, status) => ajax(
+    BASE + '/manage/product/updateStatus',
+    { productId, status },
+    'POST'
 )
 
 /**
