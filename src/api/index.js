@@ -94,6 +94,13 @@ export const reqSearchProducts = ({ pageNum, pageSize, searchName, searchType })
 //     }
 // )
 
+// 更新商品状态 1在售 2下架
+export const reqUpdateProductStatus = (productId, status) => ajax(
+    BASE + '/manage/product/updateStatus',
+    { productId, status },
+    'POST'
+)
+
 /**
  * jsonp请求的接口函数
  * @param {string} city 

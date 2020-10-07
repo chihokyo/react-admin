@@ -8,7 +8,7 @@ import {
   message
 } from 'antd'
 import LinkButton from '../../components/link-button'
-import { reqProducts, reqSearchProducts } from '../../api/index'
+import { reqProducts, reqSearchProducts, reqUpdateProductStatus } from '../../api/index'
 import { PAGE_SIZE } from '../../utils/constants'
 
 const Option = Select.Option
@@ -29,6 +29,8 @@ export default class ProductHome extends Component {
    * @param {number} pageNum 
    */
   getProducts = async (pageNum) => {
+    // 为了记录下当前的页数，记录成全局
+    this.pageNum = pageNum
     // 加载loading效果
     this.setState({
       loading: true
@@ -41,7 +43,6 @@ export default class ProductHome extends Component {
     let result
     // a:搜索
     if (searchName) {
-      console.log({ pageNum, pageSize: PAGE_SIZE, searchName, searchType })
       result = await reqSearchProducts({ pageNum, pageSize: PAGE_SIZE, searchName, searchType })
 
     } else {
@@ -61,6 +62,14 @@ export default class ProductHome extends Component {
       })
     } else {
       message.error('获取数据出错')
+    }
+  }
+  // 更新指定商品的状态
+  updateProductStatus = async (productId, status) => {
+    const result = await reqUpdateProductStatus(productId, status)
+    if (result.status === 0) {
+      message.success('更新商品成功')
+      this.getProducts(this.pageNum)
     }
   }
 
@@ -86,11 +95,18 @@ export default class ProductHome extends Component {
       {
         width: 100,
         title: '状态',
-        render: (status) => {
+        render: (product) => {
+          const { status, _id } = product
+          const newStatus = status === 1 ? 2 : 1
           return (
             <span>
-              <Button type="primary">下架</Button>
-              <span>在售</span>
+              <Button
+                type="primary"
+                onClick={() => this.updateProductStatus(_id, newStatus)}
+              >
+                {status === 1 ? '下架' : '上架'}
+              </Button>
+              <span>{status === 1 ? '在售' : '已下架'}</span>
             </span>
           )
         }
