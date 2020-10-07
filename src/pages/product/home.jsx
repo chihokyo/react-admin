@@ -71,21 +71,21 @@ export default class ProductHome extends Component {
   initColumns = () => {
     this.columns = [
       {
-        title: "商品名称",
+        title: '商品名称',
         dataIndex: 'name',
       },
       {
-        title: "商品描述",
-        dataIndex: "desc",
+        title: '商品描述',
+        dataIndex: 'desc',
       },
       {
-        title: "价格",
-        dataIndex: "price",
-        render: (price) => "¥" + price //传入对应属性值
+        title: '价格',
+        dataIndex: 'price',
+        render: (price) => '¥' + price  // 当前指定了对应的属性, 传入的是对应的属性值
       },
       {
-        title: "状态",
-        dataIndex: "status",
+        width: 100,
+        title: '状态',
         render: (status) => {
           return (
             <span>
@@ -96,18 +96,19 @@ export default class ProductHome extends Component {
         }
       },
       {
-        title: "操作",
-        dataIndex: "status",
-        render: (products) => {
+        width: 100,
+        title: '操作',
+        render: (product) => {
           return (
             <span>
-              <LinkButton>详情</LinkButton>
+              {/*将product对象使用state传递给目标路由组件*/}
+              <LinkButton onClick={() => this.props.history.push('/product/detail', { product })}>详情</LinkButton>
               <LinkButton>修改</LinkButton>
             </span>
           )
         }
       },
-    ]
+    ];
   }
 
   constructor(props) {
