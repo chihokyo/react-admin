@@ -54,6 +54,12 @@ export const reqUpdateCategory = ({ categoryId, categoryName }) => ajax(
     'POST'
 )
 
+// 根据ID获取分类
+export const reqCategoryById = (categoryId) => ajax(
+    BASE + '/manage/category/info',
+    { categoryId },
+)
+
 /**
  * 关于商品接口
  * @param {function} reqProducts  获取商品分页列表
