@@ -26,14 +26,23 @@ export default class ProductAddUpdate extends Component {
 
   /**
    * 获取1级or2级分类列表
+   * async的返回值是一个新的promise对象，它的结果是根据async函数的结果来定
    * @param {string} parentId 
    */
   getCategorys = async (parentId) => {
     const result = await reqCategorys(parentId)
+
     // 表示获取成功
     if (result.status === 0) {
       const categorys = result.data
-      this.initOptions(categorys)
+      if (parentId === '0') {
+        // 1级
+        this.initOptions(categorys)
+      } else {
+        // 2级
+        return categorys // 2级列表 → async promise 成功且value就是 categorys
+
+      }
     }
   }
 
@@ -78,38 +87,33 @@ export default class ProductAddUpdate extends Component {
    * loadData回调函数表示加载成功后获取下一级数据
    * @param {object} selectedOptions 下一级数据
    */
-  loadData = selectedOptions => {
+  loadData = async selectedOptions => {
     // 得到选择的option对象
     const targetOption = selectedOptions[0];
     // 是否显示loading效果
-    targetOption.loading = true;
-
-    // 加载下一级列表的定时器 模拟请求异步获取下一级数组
-    setTimeout(() => {
-      targetOption.loading = false
-      // 这里面是一个遍历
-      targetOption.children = [
+    targetOption.loading = true
+    // 这里的value就是下一级分类的父id
+    const subCategorys = await this.getCategorys(targetOption.value)
+    targetOption.loading = false
+    if (subCategorys && subCategorys.length > 0) {
+      // 生成一个2级列表
+      const childOptions = subCategorys.map(c => (
         {
-          label: `${targetOption.label} Dynamic 1`,
-          value: 'dynamic1',
-          isLeaf: true,// 是否有下一层列表的叶子
-        },
-        {
-          label: `${targetOption.label} Dynamic 2`,
-          value: 'dynamic2',
+          value: c._id,
+          label: c.name,
           isLeaf: true,
-        },
-      ]
-      // 更新列表最新数组对象
-      this.setState({
-        // 解构数组
-        options: [...this.state.options]
-      })
-    }, 1000);
+        }
+      ))
+      targetOption.children = childOptions
+    } else {
+      // 没有2级分类
+      targetOption.isLeaf = true
+    }
+
   }
 
   componentDidMount() {
-    this.getCategorys()
+    this.getCategorys('0')
   }
 
   render() {
@@ -167,6 +171,7 @@ export default class ProductAddUpdate extends Component {
           </Item>
           <Item label="商品分类" name="pcategory" rules={[{ required: true, message: '商品分类必须选择' }]}>
             <Cascader
+              placeholder='请选择商品分类'
               options={this.state.options} /** 需要显示的分类列表数组 */
               loadData={this.loadData}  /** 选择某个分类列表之后加载下一级列表监听回调函数 */
               onChange={this.onChange}
