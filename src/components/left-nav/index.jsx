@@ -62,7 +62,7 @@ class LeftNav extends Component {
         ))
       } else {
         // 查找一个与当前请求路径匹配的子item
-        const chilItem = item.children.find(chilItem => chilItem.key === currentPath)
+        const chilItem = item.children.find(chilItem => currentPath.indexOf(chilItem.key) === 0)
         if (chilItem) {
           this.openKey = item.key
         }
@@ -92,7 +92,13 @@ class LeftNav extends Component {
 
   render() {
     // 取得当前路径
-    const currentPath = this.props.location.pathname
+    let currentPath = this.props.location.pathname
+    console.log(currentPath.indexOf('/product'))
+    // 当前请求的是商品or商品子路由组件
+    if (currentPath.indexOf('/product') === 0) {
+      currentPath = '/product'
+    }
+
     const openKey = this.openKey
     return (
       <div to='/' className='left-nav'>
