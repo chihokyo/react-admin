@@ -9,8 +9,7 @@ import {
 } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import LinkButton from '../../components/link-button'
-import { reqCategorys } from '../../api'
-import { options } from 'less'
+import { reqCategorys, reqCategoryById } from '../../api'
 const { Item } = Form
 const { TextArea } = Input
 /**
@@ -46,11 +45,12 @@ export default class ProductAddUpdate extends Component {
     }
   }
 
+
   /**
    * 初始化商品分类列表
    * @param {object} categorys 数组
    */
-  initOptions = (categorys) => {
+  initOptions = async (categorys) => {
     // 根据 categorys 生成 options 数组
     const options = categorys.map(c => (
       {
@@ -59,6 +59,24 @@ export default class ProductAddUpdate extends Component {
         isLeaf: false,
       }
     ))
+    // 如果是一个2级分类更新
+    const { isUpdate, product } = this
+    const { pCategoryId } = product
+    let childOptions
+    if (isUpdate && pCategoryId !== '0') {
+      // 获取2级列表
+      const subCategorys = await this.getCategorys(pCategoryId)
+      // 生成2级下拉列表
+      childOptions = subCategorys.map(c => (
+        {
+          value: c._id,
+          label: c.name,
+          isLeaf: true,
+        }
+      ))
+    }
+    const targetOption = options.find(option => option.value === pCategoryId)
+    targetOption.children = childOptions
     // 更新 options 状态
     this.setState({
       options
@@ -72,7 +90,6 @@ export default class ProductAddUpdate extends Component {
    * @param {function} callback  验证通过回调函数
    */
   validatePrice = (rule, value) => {
-    console.log(rule)
     // console.log(value, typeof value)
     // 检查一下数字是否大于0
     if (value * 1 > 0) {
@@ -116,14 +133,40 @@ export default class ProductAddUpdate extends Component {
     this.getCategorys('0')
   }
 
+  constructor(props) {
+    super(props)
+    // 添加没，更新有值
+    const product = this.props.location.state
+    // 强制转换成布尔类型！！
+    this.isUpdate = !!product
+    // 没有值就是空对象，这样就可以取出避免报错
+    this.product = product || {}
+  }
+  
   render() {
+    const { isUpdate, product } = this
+    const { categoryId, pCategoryId } = product
+
+    // 接收级联分类ID数据的数组
+    const categoryIdArray = []
+    if (isUpdate) {
+      // 开始进行1级2级列表进行区分。塞入数组
+      if (pCategoryId === '0') {
+        categoryIdArray.push(categoryId)
+      } else {
+        categoryIdArray.push(categoryId)
+        categoryIdArray.push(pCategoryId)
+      }
+    }
+
     const title = (
       <span>
         <LinkButton>
           <ArrowLeftOutlined
             style={{ marginRight: '10px', color: 'green' }}
+            onClick={() => this.props.history.goBack()}
           />
-          <span>添加商品</span>
+          <span>{isUpdate ? '修改商品' : '添加商品'}</span>
         </LinkButton>
       </span>
     )
@@ -153,6 +196,12 @@ export default class ProductAddUpdate extends Component {
           name="addProductForm"
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
+          initialValues={{
+            pname: product.name,
+            pdesc: product.desc,
+            price: product.price,
+            pcategory: categoryIdArray,
+          }}
         >
           <Item label="商品名称" name="pname" rules={[{ required: true, message: '商品名称必须输入' }]}>
             <Input placeholder="商品名称" ></Input>
